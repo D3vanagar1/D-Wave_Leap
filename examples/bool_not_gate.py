@@ -1,3 +1,5 @@
+# Followed Dwave Ocean Boolean NOT Gate example
+# https://docs.ocean.dwavesys.com/en/latest/examples/not.html#not
 
 # install necessary libraries
 from dwave.system import DWaveSampler, EmbeddingComposite
