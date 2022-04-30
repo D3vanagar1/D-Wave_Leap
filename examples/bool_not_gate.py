@@ -13,6 +13,7 @@ Then represent it with a penalty function:
     2xz - x - z + 1 (where z = not(x))
 
 Formulate Problem as QUBO (https://docs.ocean.dwavesys.com/en/latest/concepts/index.html#term-QUBO)
+    * Note: QUBO matrix Q must be upper-diagonal (this happens anyways as we can always x2x1 = x1x2)
     * to map penalty function to BQN must reformulate our function
         - can drop -1 (const) as the the function's values are just shifted by -1
         - reorder in standard QUBO format:
