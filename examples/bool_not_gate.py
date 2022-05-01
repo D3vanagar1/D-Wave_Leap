@@ -2,7 +2,7 @@
 # https://docs.ocean.dwavesys.com/en/latest/examples/not.html#not
 
 # install necessary libraries
-from dwave.system import DWaveSampler, EmbeddingComposite
+from dwave.system import DWaveSampler, EmbeddingComposite, FixedEmbeddingComposite
 sampler = EmbeddingComposite(DWaveSampler())
 
 '''
@@ -32,3 +32,23 @@ print(sample_set)
 
 # check if correct
 print(sample_set.first)
+
+## Minor-Embedding a NOT Gate
+'''
+Minor Embedding maps x and z to the indexed qubits of the D-Wave QPU
+Will need to use the FixedEmbeddingComposite library instead of EmbeddingComposite
+in order to select a specific node of the sampler and look at its coupled qubits
+
+* Mapping the NOT problem (2 linear coefficents and single quadratic coefficent)
+  to biases on the D-Wave 2000Q's qubits 0 and 4 and coupling
+  * NOT gate minor embedded into topmost left unit cell of D-Wave 2000Q QPU
+  * x1 and x2 are minor embedded as qubits 0 and 4
+  * q1,q2 = -1,-1 are the biases of each qubit and q12 = 2 is the coupling strength
+  * images/NOT_gate/Embedding_Chimera_NOT.png
+'''
+
+sampler_embedded = FixedEmbeddingComposite(sampler, {'x': [0], 'z': [4]})
+print(sampler_embedded.adjacency["x"])
+sample_set_embedding = sampler_embedded.sample_qubo(Q, num_reads=7000, label='Sample - NOT Gate')
+print(sample_set_embedding)
+

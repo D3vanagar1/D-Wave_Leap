@@ -1,5 +1,6 @@
 # Following Dwave Ocean Boolean AND Gate example
 # https://docs.ocean.dwavesys.com/en/latest/examples/and.html#and
+# For embedding need to know about Chimera: https://docs.ocean.dwavesys.com/en/latest/concepts/topology.html
 
 '''
 * Formulate AND Gate as BQM
@@ -30,7 +31,8 @@
 '''
 
 #import necessary libraries
-from dwave.system import DWaveSampler, EmbeddingComposite
+import dwave.inspector
+from dwave.system import DWaveSampler, EmbeddingComposite, FixedEmbeddingComposite
 sampler = DWaveSampler()
 sampler_embedded = EmbeddingComposite(sampler)
 
@@ -39,3 +41,30 @@ Q = {('x1', 'x2'): 1, ('x1', 'z'): -2, ('x2', 'z'): -2, ('z', 'z'): 3}
 sample_set = sampler_embedded.sample_qubo(Q, num_reads = 10000, label = 'Samples - AND Gate')
 print(sample_set)
 # Note somtimes some columns have the same values everywhere except for rightmost column (chain_breaks)
+
+
+## Non-automated Minor-Embedding
+'''
+For the NOT gate we had to minor-embed a K2 graph (straight line)
+But for an AND gate we have to monr-embed a K3 graph (triangle) on D-Wave 2000Q system. Will require chaining qubits
+(Note: wouldn't need chaining on Pegasus system as it can minor-embed K3)
+* Minor-Embedding of K3 graph (AND gate)
+    * looking at Chimera topology (images/AND_gate/Chimera_Unit_Cell.png) cannot connect 3 qubits in closed loop
+    * can make closed loop of 4 qubits (ex qubits 0,3,4,7)
+    * create a chain of 2 qubits to represent a single variable => convert square to triangle
+        * (process found in images/AND_gate/Embedding_Chimera_AND.png)
+        * strength of 0-4 coupler must be set to strongly correlate the 2 qubits so that most solutions have single z value
+            * Chain strength (https://docs.ocean.dwavesys.com/en/latest/concepts/embedding.html#concepts-chain-strength)
+            * likely explains chain breaks seen earlier. Qubits in a chain with different values
+        * use FixedEmbeddingComposite library for manual minor-embedding
+'''
+
+embedding = {'x1': {3}, 'x2': {7}, 'z': {0,4}}
+sampler_minor_embedded = FixedEmbeddingComposite(sampler, embedding)
+print(sampler_minor_embedded.adjacency)
+sample_set_embedding = sampler_minor_embedded.sample_qubo(Q, num_reads = 10000, label = 'Samples - AND Gate')
+print(sample_set_embedding)
+
+# view solution on QPU
+# graphical view of og BQM representation and its embedded representation (images/AND_gate/Inspector_AND_gate.png)
+dwave.inspector.show(sample_set_embedding)
