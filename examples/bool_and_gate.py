@@ -46,7 +46,7 @@ print(sample_set)
 ## Non-automated Minor-Embedding
 '''
 For the NOT gate we had to minor-embed a K2 graph (straight line)
-But for an AND gate we have to monr-embed a K3 graph (triangle) on D-Wave 2000Q system. Will require chaining qubits
+But for an AND gate we have to embed a K3 graph (triangle) on D-Wave 2000Q system. Will require chaining qubits
 (Note: wouldn't need chaining on Pegasus system as it can minor-embed K3)
 * Minor-Embedding of K3 graph (AND gate)
     * looking at Chimera topology (images/AND_gate/Chimera_Unit_Cell.png) cannot connect 3 qubits in closed loop
